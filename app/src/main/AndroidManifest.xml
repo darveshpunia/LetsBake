@@ -30,6 +30,7 @@
         <activity
             android:name=".ui.recipedetails.RecipeDetailsActivity"
             android:label="@string/_recipe"
+            android:configChanges="orientation|screenSize|layoutDirection"
             android:parentActivityName=".ui.main.MainActivity" />
         <activity android:name=".ui.main.MainActivity">
             <intent-filter>

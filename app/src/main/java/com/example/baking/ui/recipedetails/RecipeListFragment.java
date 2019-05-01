@@ -12,9 +12,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -23,6 +25,7 @@ import com.example.baking.injection.RecipeApplication;
 import com.example.baking.models.RecipeModel;
 import com.example.baking.models.Steps;
 import com.example.baking.repository.RecipeRepository;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -110,9 +113,17 @@ public class RecipeListFragment extends Fragment {
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
       holder.title.setText((position+1) + ". " + steps.get(position).getShortDescription());
       holder.desc.setText(steps.get(position).getDescription());
+      if (!TextUtils.isEmpty(steps.get(position).getThumbnailURL())) {
+        holder.imageIcon.setVisibility(View.VISIBLE);
+        Picasso.get()
+          .load(steps.get(position).getThumbnailURL())
+          .placeholder(R.drawable.image_placeholder)
+          .error(R.drawable.image_error)
+          .into(holder.imageIcon);
+      }
       holder.itemView.setOnClickListener(__->{
         iFragListener.updateURL(steps.get(position).getVideoURL());
       });
@@ -127,11 +138,12 @@ public class RecipeListFragment extends Fragment {
       TextView title;
       TextView desc;
       LinearLayout layout;
+      ImageView imageIcon;
       ViewHolder(View view) {
         super(view);
         title = view.findViewById(R.id.text_title);
         desc = view.findViewById(R.id.text_desc);
-        //subTitle = view.findViewById(R.id.sub_title);
+        imageIcon = view.findViewById(R.id.image_icon);
       }
     }
   }

@@ -3,13 +3,16 @@ package com.example.baking.ui.main;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,6 +28,7 @@ import com.example.baking.ui.recipedetails.ShowIngredientsActivity;
 import com.example.baking.utils.Constants;
 import com.example.baking.utils.Utils;
 import com.google.gson.GsonBuilder;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -112,11 +116,23 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
       holder.title.setText(recipes.get(position).getName());
       holder.steps.setText(String.valueOf(recipes.get(position).getSteps().size()));
       holder.ingredients.setText(String.valueOf(recipes.get(position).getIngredients().size()));
       holder.servings.setText(String.valueOf(recipes.get(position).getServings()) + " Servings");
+      if (TextUtils.isEmpty(recipes.get(position).getImage())) {
+        holder.layoutNoImage.setVisibility(View.VISIBLE);
+        holder.layoutImage.setVisibility(View.GONE);
+      } else {
+        holder.layoutNoImage.setVisibility(View.GONE);
+        holder.layoutImage.setVisibility(View.VISIBLE);
+        Picasso.get()
+          .load(recipes.get(position).getImage())
+          .placeholder(R.drawable.image_placeholder)
+          .error(R.drawable.image_error)
+          .into(holder.imageRecipe);
+      }
       holder.layoutSteps.setOnClickListener(__->{
         context.startActivity(RecipeDetailsActivity.getActivityIntent(context, recipes.get(position).getId()));
         recipeModelPublishSubject.onNext(recipes.get(position));
@@ -137,20 +153,30 @@ public class MainActivity extends BaseActivity {
     class ViewHolder extends RecyclerView.ViewHolder {
       TextView title;
       TextView steps;
+      TextView title2;
+      TextView servings2;
       TextView servings;
       TextView ingredients;
       CardView layout;
       LinearLayout layoutSteps;
       LinearLayout layoutIngredients;
+      LinearLayout layoutImage;
+      LinearLayout layoutNoImage;
+      ImageView imageRecipe;
       ViewHolder(View view) {
         super(view);
         title = view.findViewById(R.id.text_title);
+        title2 = view.findViewById(R.id.text_title2);
+        servings2 = view.findViewById(R.id.text_serving_count2);
         servings = view.findViewById(R.id.text_serving_count);
         steps = view.findViewById(R.id.text_step_count);
         ingredients = view.findViewById(R.id.text_ingrd_count);
         layout = view.findViewById(R.id.layout_recipe_card);
         layoutSteps = view.findViewById(R.id.layout_steps);
         layoutIngredients = view.findViewById(R.id.layout_ingredients);
+        layoutNoImage = view.findViewById(R.id.layout_no_image);
+        layoutImage = view.findViewById(R.id.layout_with_image);
+        imageRecipe = view.findViewById(R.id.image_recipe);
         //subTitle = view.findViewById(R.id.sub_title);
       }
     }

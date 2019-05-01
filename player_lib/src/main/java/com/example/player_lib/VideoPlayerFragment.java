@@ -2,11 +2,14 @@ package com.example.player_lib;
 
 
 import android.annotation.SuppressLint;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -44,8 +47,11 @@ public class VideoPlayerFragment extends Fragment {
   private boolean playWhenReady = true;
 
   private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
+  private final String CURRENT_WINDOW = "CURRENT_WINDOW";
+  private final String PLAYBACK_POSITION = "PLAYBACK_POSITION";
 
   TextView tvNoVideo;
+  private LinearLayout.LayoutParams params;
 
   public static VideoPlayerFragment newInstance(String url) {
     Bundle args = new Bundle();
@@ -62,7 +68,18 @@ public class VideoPlayerFragment extends Fragment {
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    if (savedInstanceState != null) {
+      currentWindow = savedInstanceState.getInt(CURRENT_WINDOW);
+      playbackPosition = savedInstanceState.getLong(PLAYBACK_POSITION);
+    }
     getFragArguments();
+  }
+
+  @Override
+  public void onSaveInstanceState(@NonNull Bundle outState) {
+    outState.putInt(CURRENT_WINDOW, currentWindow);
+    outState.putLong(PLAYBACK_POSITION, playbackPosition);
+    super.onSaveInstanceState(outState);
   }
 
   private void getFragArguments() {
@@ -141,16 +158,6 @@ public class VideoPlayerFragment extends Fragment {
       player.release();
       player = null;
     }
-  }
-
-  @SuppressLint("InlinedApi")
-  private void hideSystemUi() {
-    playerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-      | View.SYSTEM_UI_FLAG_FULLSCREEN
-      | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-      | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-      | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-      | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
   }
 
   private MediaSource buildMediaSource(Uri uri) {
